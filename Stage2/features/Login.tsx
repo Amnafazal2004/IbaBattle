@@ -14,7 +14,7 @@ export default function EmailPassword() {
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState("");
   const supabase = getSupabaseBrowserClient();
-  const [currentUser, setCurrentUser] = useState<User | null>(user);
+  const [currentUser, setCurrentUser] = useState<User | null | undefined>(user);
 
   async function handleSignOut() {
     await supabase.auth.signOut();
@@ -37,8 +37,8 @@ export default function EmailPassword() {
         // options: {
         //   emailRedirectTo: `${window.location.origin}/about`,
         // }
-        
       });
+      
       if (error) {
         setStatus(error.message);
       } else {

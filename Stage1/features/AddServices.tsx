@@ -17,7 +17,7 @@ const Header = () => {
     desc && formData.append("desc", desc);
 
     try {
-      const { data } = await axios.post("api/Services", formData);
+      const { data } = await axios.post("/api/Services", formData);
       if (data.success) {
         console.log(data.message);
         settitle('')

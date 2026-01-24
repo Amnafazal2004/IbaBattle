@@ -8,20 +8,34 @@ export async function POST(request: Request) {
     const id = formData.get("id") as string
     const title = formData.get("title") as string;
     const desc = formData.get("desc") as string;
+     const category = formData.get("category") as string;
+      const neighbour = formData.get("neighbour") as string;
+       const pricestr = formData.get("price") as string;
+       const price = Number(pricestr)
+    console.log("got data")
     await prisma.services.create({
             data:{
                 title: title,
                 description: desc,
+                category: category,
+                neighbour: neighbour,
+                price: price,
+
+
+
+
                 authorId: id
             }
         })
-         return NextResponse.json({ success: true, message: "service added" })
+      console.log("added in db")
+  return NextResponse.json({ success: true, message: "service added" })
   } catch (error) {
-    return NextResponse.json({ success: false });
+    // console.error("API failed:", error);
+    return NextResponse.json({ success: false, message: error });
   }
 }
 
-export async function GET(request: Request) {
+export async function GET(request:Request) {
   try{
     const services = await prisma.services.findMany();
     return NextResponse.json({success:true, services})
