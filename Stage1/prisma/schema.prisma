@@ -20,9 +20,7 @@ model Services {
   id          String     @id @default(uuid()) @db.Uuid
   title       String
   description String
-  category String
-  neighbour String
-  price Int 
+  
   authorId    String     @db.Uuid
   bookings    Bookings[]
   author      Profile    @relation(fields: [authorId], references: [id])
