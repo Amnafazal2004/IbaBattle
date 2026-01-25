@@ -23,7 +23,7 @@ useEffect(() => {
   const fetchBookings = async () => {
     try {
       const { data } = await axios.get("/api/Bookings", {
-        params: { serviceId }
+        params: { id:serviceId }
       });
       setBookings(data); // API returns array of bookings
     } catch (err) {
