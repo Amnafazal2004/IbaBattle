@@ -1,4 +1,11 @@
+"use client"
+
+import { useNeighbourContext } from "@/Context/NeighbourlyContext";
+import Login from "./Login";
+
 export default function NeighbourlyHeader() {
+  const {showlogin, setshowlogin} = useNeighbourContext()
+
   return (
     <>
       {/* Header */}
@@ -20,16 +27,22 @@ export default function NeighbourlyHeader() {
             </nav>
 
             {/* CTA Buttons */}
-            <div className="flex items-center gap-4">
-              <button className="px-5 py-2 border-2 border-black rounded-full text-sm font-semibold hover:bg-black hover:text-white transition">
-                Sign in
-              </button>
-              <button className="p-2 hover:opacity-70 transition">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" />
-                </svg>
-              </button>
-            </div>
+        <div className="flex items-center gap-4">
+       
+        {showlogin?
+        <div>
+          <Login></Login>
+        </div> : <button onClick={()=> showlogin?setshowlogin(false): setshowlogin(true) } className="px-5 py-2 border-2 border-black rounded-full text-sm font-semibold hover:bg-black hover:text-white transition">
+          Sign in
+        </button>
+        }
+       
+          <button className="p-2 hover:opacity-70 transition">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" />
+            </svg>
+          </button>
+        </div>
           </div>
         </div>
       </div>

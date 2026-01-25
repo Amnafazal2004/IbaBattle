@@ -1,10 +1,14 @@
+"use client"
 import Image from 'next/image'
 import skills from '@/Assets/skills.png';
 import repair from '@/Assets/repair.png';
 import family from '@/Assets/family.png';
 import chores from '@/Assets/chores.png';
+import { useUserContext } from '@/Context/UserContext';
+import Link from 'next/link';
 
 export default function ServicesSection() {
+  const user = useUserContext();
   return (
     <div className="bg-white py-20">
       <div className="max-w-7xl mx-auto px-6">
@@ -104,11 +108,15 @@ export default function ServicesSection() {
         </div>
 
         {/* See All Services Button */}
-        <div className="text-center">
+       {user? <Link href="/Services"> <div className="text-center">
           <button className="px-8 py-3 bg-black text-white rounded-full text-base font-semibold hover:bg-gray-800 transition shadow-lg">
             See All Services Available
           </button>
-        </div>
+        </div> </Link> :  <div className="text-center">
+          <button className="px-8 py-3 bg-black text-white rounded-full text-base font-semibold hover:bg-gray-800 transition shadow-lg">
+            See All Services Available
+          </button>
+        </div> }
       </div>
     </div>
   );
