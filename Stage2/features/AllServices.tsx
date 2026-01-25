@@ -58,7 +58,6 @@ const AllServices = () => {
     <div className="bg-red-600">
      <select name='category'
               value={category} onChange={(event)=> setcategory(event.target.value)}>
-              <option value="All">All</option>
               <option value="House Chores">House Chores</option>
               <option value="Repairs and Maintenance">Repairs and Maintenance</option>
               <option value="Tuition">Tuition</option>
@@ -71,7 +70,6 @@ const AllServices = () => {
       <div className="bg-red-600">
      <select name='neighbour'
               value={category} onChange={(event)=> setneighbour(event.target.value)}>
-              <option value="All">All</option>
               <option value="East">East</option>
               <option value="West">West</option>
               <option value="South">South</option>
@@ -80,7 +78,7 @@ const AllServices = () => {
     </div>: null}
 
      { filterby === "price"?
-      <div className="bg-red-600">
+      <div className="bg-red-300">
      <select name='price'
               value={price} onChange={(event)=> setprice(event.target.value)}>
               <option value="low">Low</option>
@@ -90,11 +88,35 @@ const AllServices = () => {
     <div>
   {services && services.length > 0 ? (
     <ul>
-      {services
-        .filter(service => service.category === category)
+      { filterby === "Category" ?
+      services
+        .filter(service => (service.category === category))
         .map(service => (
-          <li key={service.id}>{service.title} - ${service.price}</li>
-        ))}
+          <li key={service.id}>{service.title} - ${service.price}  - {service.neighbour} - {service.category}</li>
+        )) : null}
+
+        { filterby === "Neighbourhood" ?
+      services
+        .filter(service => service.neighbour === neighbour)
+        .map(service => (
+          <li key={service.id}>{service.title} - ${service.price} - {service.neighbour} - {service.category} </li>
+        )) : null}
+      { filterby === "price" ?
+      services
+       .sort((a, b) => price === "low" ? a.price - b.price : b.price - a.price)
+        .map(service => (
+          <li key={service.id}>{service.title} - ${service.price} - {service.neighbour} - {service.category} </li>
+        )) : null
+        }
+
+          { filterby === "None" ?
+      services
+      
+        .map(service => (
+          <li key={service.id}>{service.title} - ${service.price} - {service.neighbour} - {service.category} </li>
+        )) : null
+        }
+
     </ul>
   ) : (
     <p>No services loaded.</p>
