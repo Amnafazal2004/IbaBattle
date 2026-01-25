@@ -15,32 +15,21 @@ const BookingTest = () => {
   const [bookingId, setBookingId] = useState("");
 
   const authorId = user?.id || "";
+     const params = useParams();
+// params.id might be string | string[] | undefined
+   const serviceid: string = Array.isArray(params.id) ? params.id[0] : params.id ?? "";
 
-useEffect(() => {
-  if (serviceId) fetchBookings();
-}, [serviceId]); 
-  // Fetch bookings for this service
-  const fetchBookings = async () => {
-    try {
-      const { data } = await axios.get("/api/Bookings", {
-        params: { id:serviceId }
-      });
-      setBookings(data); // API returns array of bookings
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   // Create booking
   const createBooking = async () => {
-    if (!serviceId || !authorId) {
+    if (!serviceid || !authorId) {
       alert("Missing service ID or user ID!");
       return;
     }
 
     try {
       const formData = new FormData();
-      formData.append("serviceId", serviceId);
+      formData.append("serviceId", serviceid);
       formData.append("authorId", authorId);
       formData.append("bookingDate", bookingDate);
       formData.append("timeSlot", timeSlot);
@@ -51,7 +40,6 @@ useEffect(() => {
         alert("Booking created!");
         setBookingDate("");
         setTimeSlot("");
-        fetchBookings();
       } else {
         alert(data.message);
       }
@@ -60,45 +48,7 @@ useEffect(() => {
     }
   };
 
-  // Update booking
-  const updateBooking = async () => {
-    try {
-      const formData = new FormData();
-      formData.append("id", bookingId);
-      formData.append("bookingDate", bookingDate);
-      formData.append("timeSlot", timeSlot);
-
-      const { data } = await axios.put("/api/Bookings", formData);
-
-      if (data.success) {
-        alert("Booking updated!");
-        fetchBookings();
-      } else {
-        alert("Failed to update booking.");
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  // Delete booking
-  const deleteBooking = async (id: string) => {
-    try {
-      const formData = new FormData();
-      formData.append("id", id);
-
-      const { data } = await axios.delete("/api/Bookings", { data: formData });
-
-      if (data.success) {
-        alert("Booking deleted!");
-        fetchBookings();
-      } else {
-        alert("Failed to delete booking.");
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+ 
 
   if (!user) {
     return (
@@ -134,9 +84,6 @@ useEffect(() => {
         <div className="w-full max-w-2xl space-y-8">
           <div className="bg-white border-2 border-black rounded-xl p-8 shadow-lg">
             <h2 className="text-3xl font-bold mb-4 text-center">Book This Service</h2>
-            <p className="text-gray-600 text-center mb-6">
-              Service ID: <span className="font-semibold">{serviceId}</span> | User ID: <span className="font-semibold">{authorId}</span>
-            </p>
 
             <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); createBooking(); }}>
               <div>
@@ -168,30 +115,6 @@ useEffect(() => {
                 Create Booking
               </button>
             </form>
-          </div>
-
-          {/* Existing Bookings */}
-          <div>
-            <h3 className="text-2xl font-bold mb-4">Existing Bookings</h3>
-            <div className="space-y-4">
-              {bookings.map((b) => (
-                <div key={b.id} className="bg-white border-2 border-black rounded-xl p-4 shadow flex justify-between items-center">
-                  <div>
-                    <p className="text-sm font-semibold">Booking ID: {b.id}</p>
-                    <p className="text-sm">Service: {b.service.title}</p>
-                    <p className="text-sm">Author: {b.author.email}</p>
-                    <p className="text-sm">Date: {new Date(b.bookingDate).toLocaleDateString()}</p>
-                    <p className="text-sm">Time: {b.timeSlot}</p>
-                  </div>
-                  <button
-                    onClick={() => deleteBooking(b.id)}
-                    className="px-3 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover:bg-red-700 transition"
-                  >
-                    Delete
-                  </button>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </div>

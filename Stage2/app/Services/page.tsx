@@ -33,6 +33,7 @@ const AllServices = () => {
         return;
       }
       setServices(response.data.services);
+      console.log(response.data.services)
     } catch (error) {
       console.error("Error fetching services:", error);
     }
