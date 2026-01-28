@@ -1,15 +1,11 @@
 "use client"
 
 import { useNeighbourContext } from "@/Context/NeighbourlyContext";
-import { useSession } from "@/lib/auth-client";
-import React, { useEffect, useState } from "react";
-import Signout from "./SignOut";
-import Signin from "./Signin";
-import Signup from "./Signup";
+import Login from "./Login";
+
 
 export default function NeighbourlyHeader() {
   const {showlogin, setshowlogin, signin} = useNeighbourContext()
-  const { data: session } = useSession();
 
   return (
     <>
@@ -32,7 +28,7 @@ export default function NeighbourlyHeader() {
             </nav>
 
             {/* CTA Buttons */}
-        <div className="flex items-center gap-4">
+        {/* <div className="flex items-center gap-4">
            {session?.user ? (
             <Signout />
           ) : (
@@ -44,17 +40,17 @@ export default function NeighbourlyHeader() {
                 Login
               </button>
             </>
-          )}
+          )} */}
        
-        {/* {showlogin?
+        {showlogin?
         <div>
           <Login></Login>
         </div> : <button onClick={()=> showlogin?setshowlogin(false): setshowlogin(true) } className="px-5 py-2 border-2 border-black rounded-full text-sm font-semibold hover:bg-black hover:text-white transition">
           Sign in
         </button>
-        } */}
+        }
 
-        {showlogin ? (
+        {/* {showlogin ? (
   <div className="fixed inset-0 z-50 bg-[#00000090] flex items-center justify-center">
     <div className="relative">
       {signin ? <Signin /> : <Signup />}
@@ -67,7 +63,7 @@ export default function NeighbourlyHeader() {
               <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" />
             </svg>
           </button>
-        </div>
+        </div> */}
           </div>
         </div>
       </div>
