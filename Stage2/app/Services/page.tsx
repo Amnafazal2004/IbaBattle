@@ -4,6 +4,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+
 interface Service {
   id: string;
   title: string;
@@ -20,7 +21,8 @@ const AllServices = () => {
   const [filterBy, setFilterBy] = useState<string>("None");
   const [category, setCategory] = useState<string>("House Chores");
   const [neighbour, setNeighbour] = useState<string>("East");
-  const [price, setPrice] = useState<string>("low");
+  const [price, setPrice] = useState<string>("low")
+  const [role,setrole] = useState("seeker")
 
   const fetchServices = async () => {
     try {
@@ -39,8 +41,25 @@ const AllServices = () => {
     }
   };
 
+    const fetchRole = async () => {
+    try{
+       const { data } = await axios.get("api/Roles");
+    if (data.success) {
+      setrole(data.role);
+      console.log(data.role)
+    }
+   }
+   catch(error){
+    console.error(error)
+   } 
+  };
+
+
+
   useEffect(() => {
+    fetchRole()
     fetchServices();
+    
   }, []);
 
   const getFilteredServices = () => {
@@ -136,12 +155,12 @@ const AllServices = () => {
             </div>
 
             {/* Right - Add Service Button */}
-            <button
+          {role !== "seeker" ? <button
               onClick={() => router.push('/AddService')}
               className="px-5 py-2 border-2 border-black rounded-full text-sm font-semibold hover:bg-black hover:text-white transition"
             >
               + Add Service
-            </button>
+            </button> : null}
           </div>
         </div>
       </div>

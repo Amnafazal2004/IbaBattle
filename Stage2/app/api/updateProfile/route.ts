@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import {  Role } from "@/generated/prisma/client";
+import {  Role } from "@/generated/client";
 
 
-export async function POST(request: Request) {
+export async function PUT(request: Request) {
   console.log("Api route hit");
   try {
     const formData = await request.formData();

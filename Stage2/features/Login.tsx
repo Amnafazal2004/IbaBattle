@@ -2,8 +2,7 @@
 
 import { useUserContext } from "@/Context/UserContext";
 import { getSupabaseBrowserClient } from "@/lib/supabase/browserclient";
-import { User } from "@supabase/supabase-js";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
 
 import {
@@ -22,65 +21,63 @@ import { toast } from "sonner";
 type Mode = "signup" | "signin";
 
 export default function EmailPasswordModal() {
-  const user = useUserContext();
+  const {user, loading} = useUserContext();
+
   const supabase = getSupabaseBrowserClient();
 
-  const [role,setrole] = useState("")
+  const [role, setrole] = useState("");
   const [mode, setMode] = useState<Mode>("signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState("");
-  const [currentUser, setCurrentUser] = useState<User | null | undefined>(user);
   const [isOpen, setIsOpen] = useState(false);
-  const [roleupdated, setroleupdated] = useState(false)
-
-  useEffect(() => {
-    setCurrentUser(user);
-  }, [user]);
+  const [updatetherole, setupdatetherole] = useState(false)
+  
 
   async function handleSignOut() {
     await supabase.auth.signOut();
-    setCurrentUser(null);
     setStatus("Signed out successfully");
   }
 
   async function updateprofile(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setroleupdated(true)
-    if(!user) return toast("User not found")
+    e.preventDefault();
+    if (!user) return toast("User not found");
 
     const formData = new FormData();
     formData.append("id", user?.id);
     formData.append("role", role);
-     try {
-      const { data } = await axios.put("/api/updateProfile", formData); 
+    try {
+      const { data } = await axios.put("/api/updateProfile", formData);
       if (data.success) {
-       setrole('')
-        alert('role added successfully!');
+        setupdatetherole(false)
+        setrole("");
+        alert("role added successfully!");
       } else {
-        setroleupdated(false)
         console.log("error");
       }
     } catch (error) {
       console.log("error", error);
     }
-    
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (mode === "signup") {
-      const { data,error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({ email, password });
       console.log("Supabase signUp response:", { data, error });
       if (error) {
         console.error("Sign-up error details:", error);
         setStatus(error.message);
       } else {
         setStatus("Check your inbox to confirm the new account.");
+        setupdatetherole(true)
       }
     } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
       if (error) {
         setStatus(error.message);
       } else {
@@ -90,30 +87,33 @@ export default function EmailPasswordModal() {
     }
   }
 
-  // If user is logged in, show sign out button
-  if (currentUser) {
-    return (
-      <>
-      {/* {!roleupdated? <form onSubmit={updateprofile}>
-        Are you provider or seeker?
-        <button type="submit" onClick={()=>setrole("provider")} >
-          provider
-        </button>
-        <button onClick={()=>setrole("seeker")} type="submit">seeker</button>
-      </form>: null}
-    {roleupdated ?  */}
-    <button
-      onClick={handleSignOut}
-      className="px-5 py-2 border-2 border-black rounded-full text-sm font-semibold hover:bg-black hover:text-white transition"
-    >
-      Sign out
-    </button> 
-   {/* : null}  */}
-      </>
-    );
+  if(loading) return null
+
+  if(user){
+     return(
+     <>
+      {updatetherole ? (
+                <form onSubmit={updateprofile}>
+                  Are you provider or seeker?
+                  <button type="submit" onClick={() => setrole("provider")}>
+                    provider
+                  </button>
+                  <button onClick={() => setrole("seeker")} type="submit">
+                    seeker
+                  </button>
+                </form>
+              ) :  <button
+                  onClick={handleSignOut}
+                  className="px-5 py-2 border-2 border-black rounded-full text-sm font-semibold hover:bg-black hover:text-white transition"
+                >
+                  Sign out
+                </button>}
+             
+     </>
+  )
   }
 
-  // If user is not logged in, show sign in button + modal
+
   return (
     <>
       {/* Button to open modal */}
@@ -121,16 +121,16 @@ export default function EmailPasswordModal() {
         onClick={() => setIsOpen(true)}
         className="px-5 py-2 border-2 border-black rounded-full text-sm font-semibold hover:bg-black hover:text-white transition"
       >
-       Sign in
+        Sign in
       </button>
 
       {/* Modal Overlay */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
           onClick={() => setIsOpen(false)}
         >
-          <div 
+          <div
             className="relative w-full max-w-md"
             onClick={(e) => e.stopPropagation()}
           >
@@ -157,17 +157,16 @@ export default function EmailPasswordModal() {
               <CardContent>
                 {/* Toggle */}
                 <div className="flex gap-2 mb-6">
-                    <Button
-                      type="button"
-                      className="w-full"
-                      onClick={() => {
-                        setMode( ()=> mode === "signin" ? "signup" : "signin")
-                        setStatus("");
-                      }}
-                    >
-                      {mode === "signup" ? "Sign in" : "Sign up"}
-                    </Button> 
-
+                  <Button
+                    type="button"
+                    className="w-full"
+                    onClick={() => {
+                      setMode(() => (mode === "signin" ? "signup" : "signin"));
+                      setStatus("");
+                    }}
+                  >
+                    {mode === "signup" ? "Sign in" : "Sign up"}
+                  </Button>
                 </div>
 
                 {/* Form */}
@@ -216,8 +215,16 @@ export default function EmailPasswordModal() {
           </div>
         </div>
       )}
+
+
+        
     </>
   );
-}
+
+
+ }
+  
+  
+
 
 

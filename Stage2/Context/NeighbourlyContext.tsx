@@ -1,11 +1,6 @@
 "use client";
 
-import React, {
-  useState,
-  createContext,
-  useContext,
-  ReactNode,
-} from "react";
+import React, { useState, createContext, useContext, ReactNode, useEffect } from "react";
 
 type NeighbourContextType = {
   showlogin: boolean;
@@ -17,7 +12,7 @@ type NeighbourContextType = {
 };
 
 const NeighbourlyContext = createContext<NeighbourContextType | undefined>(
-  undefined
+  undefined,
 );
 
 export const useNeighbourContext = (): NeighbourContextType => {
@@ -25,7 +20,7 @@ export const useNeighbourContext = (): NeighbourContextType => {
 
   if (!context) {
     throw new Error(
-      "useNeighbourContext must be used within a NeighbourContextProvider"
+      "useNeighbourContext must be used within a NeighbourContextProvider",
     );
   }
 
@@ -38,9 +33,10 @@ type ProviderProps = {
 
 const NeighbourContextProvider = ({ children }: ProviderProps) => {
   const [showlogin, setshowlogin] = useState<boolean>(false);
-      const [signup, setsignup] = useState<boolean>(false);
-  
-    const [signin, setsignin] = useState<boolean>(true);
+  const [signup, setsignup] = useState<boolean>(false);
+  const [signin, setsignin] = useState<boolean>(true);
+
+
 
   return (
     <NeighbourlyContext.Provider
@@ -50,7 +46,7 @@ const NeighbourContextProvider = ({ children }: ProviderProps) => {
         signup,
         setsignup,
         signin,
-        setsignin,
+        setsignin
       }}
     >
       {children}
