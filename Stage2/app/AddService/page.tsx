@@ -1,8 +1,10 @@
 "use client"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useUserContext } from "@/Context/UserContext";
 import Footer from "@/features/Footer";
+import { toast } from "sonner";
+
 
 const AddServiceForm = () => {
    const [title, settitle] = useState<string>("");
@@ -10,16 +12,10 @@ const AddServiceForm = () => {
    const [category, setcategory] = useState<string>("House Chores");
    const [neighbour, setneighbour] = useState<string>("East");
    const [price, setprice] = useState<string>("");
-   const user = useUserContext();
+   const {user} = useUserContext();
    
    console.log("Current user in Header:", user);
-   
-   if (user === undefined) return (
-     <div className="min-h-screen bg-white flex items-center justify-center">
-       <p className="text-lg font-semibold">Loading...</p>
-     </div>
-   );
-
+  
    const onsubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
@@ -41,19 +37,21 @@ const AddServiceForm = () => {
       const { data } = await axios.post("/api/Services", formData); 
       if (data.success) {
         console.log("msg ",data.message);
+        console.log("source ",data.source);
         settitle('');
         setdesc('');
         setcategory('House Chores');
         setneighbour('East');
         setprice('');
-        alert('Service added successfully!');
+        toast('Service added successfully!');
       } else {
-        console.log("error");
+        toast("Failed to add the service, Try Again!")
       }
     } catch (error) {
       console.log("error", error);
     }
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-pink-50 flex flex-col">

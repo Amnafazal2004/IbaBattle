@@ -69,7 +69,7 @@ const AllServices = () => {
     { filterby === "Neighbourhood"?
       <div className="bg-red-600">
      <select name='neighbour'
-              value={category} onChange={(event)=> setneighbour(event.target.value)}>
+              value={neighbour} onChange={(event)=> setneighbour(event.target.value)}>
               <option value="East">East</option>
               <option value="West">West</option>
               <option value="South">South</option>
