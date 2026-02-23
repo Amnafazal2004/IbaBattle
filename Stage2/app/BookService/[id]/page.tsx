@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 import { toast } from "sonner";
 
 const BookingTest = () => {
-  const user = useUserContext();
+  const {user, loading} = useUserContext();
   
   const [bookingDate, setBookingDate] = useState("");
   const [timeSlot, setTimeSlot] = useState("");
@@ -47,14 +47,21 @@ const BookingTest = () => {
   };
 
  
+if (loading) {
+  return (
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <p className="text-lg font-semibold">Loading...</p>
+    </div>
+  );
+}
 
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <p className="text-lg font-semibold">Loading...</p>
-      </div>
-    );
-  }
+if (!user) {
+  return (
+    <div className="min-h-screen bg-white flex items-center justify-center">
+      <p className="text-lg font-semibold">Please log in to book a service.</p>
+    </div>
+  );
+}
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-pink-50 flex flex-col">

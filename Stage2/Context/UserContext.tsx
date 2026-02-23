@@ -5,11 +5,13 @@ import { getSupabaseBrowserClient } from "@/lib/supabase/browserclient"
 import { User } from "@supabase/supabase-js";
 
 type UserContextType = {
-  user: User | null
+ 
+  user: User | null,
   loading: boolean;
 };
 
 const UserContext = createContext<UserContextType>({
+ 
   user: null,
   loading: true
 });
