@@ -1,17 +1,19 @@
 import { prisma } from "@/lib/prisma";
+import { rateLimit } from "@/lib/ratelimiter";
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/serverclient";
 import { canUser } from "@/lib/ability"; // your RBAC helper
 import client, { connectRedis } from "@/lib/redis";
+import {getExistingService} from "@/lib/check"
 
 export async function POST(request: NextRequest) {
   console.log("Api route hit");
   try {
-    await connectRedis()
-    // 1️ Create Supabase server client with cookies
+    await connectRedis();
+    // Create Supabase server client with cookies
     const supabase = await createSupabaseServerClient();
 
-    // 2️ Get the logged-in user
+    // Get the logged-in user
     const {
       data: { user },
       error,
@@ -20,11 +22,25 @@ export async function POST(request: NextRequest) {
     if (error || !user)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    // 3️ Check RBAC permission
-    const allowed = await canUser(user.id, "service:create");
+    //do this if you want to limit the user by seeing the ip
+   // const ip = request.headers.get("x-forwarded-for") ?? "anonymous";
+
+    const userid =  user.id
+    const { success } = await rateLimit(userid);
+
+    if (!success) {
+      return NextResponse.json(
+        { message: "Too many requests" },
+        { status: 429 },
+      );
+    }
+
+    // Check RBAC permission
+    const allowed = await canUser(userid, "service:create");
     console.log("here 2", allowed);
     if (!allowed)
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
 
     const formData = await request.formData();
     const id = formData.get("id") as string;
@@ -36,12 +52,16 @@ export async function POST(request: NextRequest) {
     const price = Number(pricestr);
     console.log("got data");
     const services = {
-        title: title,
+      title: title,
       description: desc,
       category: category,
       neighbourhood: neighbour,
       price: pricestr,
+    };
 
+    const matchedService =  await getExistingService(title,neighbour,id)
+    if(matchedService){
+       return NextResponse.json({ success: false, message: "This service already exists" });
     }
 
     await prisma.services.create({
@@ -57,17 +77,15 @@ export async function POST(request: NextRequest) {
     });
     console.log("added in db");
 
-     try {
-     await client.hSet('services', id , JSON.stringify(services));
-     await client.hexpire('services',10)
-    
+    try {
+      await client.lPush(`user:${id}:services`, JSON.stringify(services));
     } catch (redisError) {
       console.error("Redis list error:", redisError);
       // Continue even if Redis fails
     }
-     console.log("added in redis");
+    console.log("added in redis");
 
-    return NextResponse.json({ success: true, message: "service added" });
+    return NextResponse.json({ success: true, message: "Service added successfully" });
   } catch (error) {
     return NextResponse.json({ success: false, message: error });
   }
@@ -77,31 +95,27 @@ export async function GET(request: Request) {
   try {
     await connectRedis();
 
-    const cachedServices = await client.hGetAll('services');
+    const cachedServices = await client.hGetAll("services");
 
     if (cachedServices && Object.keys(cachedServices).length > 0) {
       // Parse JSON strings to objects
       const services = Object.values(cachedServices).map((s) => JSON.parse(s));
-      return NextResponse.json({ success: true, services, source: 'redis' });
-    } 
-    else{
-        const services = await prisma.services.findMany();
-         return NextResponse.json({ success: true, services, source: "db" });
-
+      return NextResponse.json({ success: true, services, source: "redis" });
+    } else {
+      const services = await prisma.services.findMany();
+      return NextResponse.json({ success: true, services, source: "db" });
     }
   } catch (error) {
     return NextResponse.json({ success: false });
   }
 }
 
-
-//if only get services of one user 
+//if only get services of one user
 // const cachedService = await client.hGet('services', id);
 // if (cachedService) {
 //   const service = JSON.parse(cachedService);
 //   return NextResponse.json({ success: true, service, source: 'redis' });
 // }
-
 
 // We add them to a Redis hash called "services":
 // HSET "services" "1" '{"id":"1","title":"Cleaning","price":50}'

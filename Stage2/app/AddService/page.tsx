@@ -43,9 +43,9 @@ const AddServiceForm = () => {
         setcategory('House Chores');
         setneighbour('East');
         setprice('');
-        toast('Service added successfully!');
+        toast(data.message);
       } else {
-        toast("Failed to add the service, Try Again!")
+        toast(data.message)
       }
     } catch (error) {
       console.log("error", error);

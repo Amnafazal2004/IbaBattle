@@ -8,27 +8,37 @@ export async function proxy(request: NextRequest) {
       headers: request.headers,
     },
   });
+
   const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+
+  const { data: { user }} = await supabase.auth.getUser();
   console.log({ user });
+
+
+  // Redirect non-authenticated users away from protected routes
+  if (request.nextUrl.pathname.startsWith("/Services")) {
   if (!user) {
     return NextResponse.redirect(new URL("/", request.url));
   }
-  let role = await getUserRole(user.id);
-
-  // Redirect non-authenticated users away from protected routes
-  if (!user && request.nextUrl.pathname.startsWith("/Services")) {
-    return NextResponse.redirect(new URL("/", request.url));
   }
 
-  if (!user && request.nextUrl.pathname.startsWith("/AdminDashboard")) {
+  if (request.nextUrl.pathname.startsWith("/AdminDashboard")) {
+    
+  if (!user) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+  
+  let role = await getUserRole(user.id);
     if (role !== "admin") {
       return NextResponse.redirect(new URL("/", request.url));
     }
   }
-    if (!user && request.nextUrl.pathname.startsWith("/ProviderDashboard")) {
+
+  if (request.nextUrl.pathname.startsWith("/ProviderDashboard")) {
+    if (!user) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+     let role = await getUserRole(user.id);
     if (role !== "provider") {
       return NextResponse.redirect(new URL("/", request.url));
     }

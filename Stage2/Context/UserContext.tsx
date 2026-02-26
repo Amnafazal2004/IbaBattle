@@ -30,7 +30,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user);
       setloading(false)
-      console.log("User loaded:", user); // Debug log
+    //  console.log("User loaded:", user); // Debug log
     });
 
     // Listen for auth state changes
@@ -38,7 +38,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       (_event, session) => {
         setUser(session?.user ?? null);
         setloading(false)
-        console.log("Auth state changed:", session?.user); // Debug log
+      //  console.log("Auth state changed:", session?.user); // Debug log
       }
     );
 
